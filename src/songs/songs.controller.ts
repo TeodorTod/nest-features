@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { SongsService } from './songs.service';
+import { CreateSongDTO } from './dto/create-song-dto';
 
 @Controller('songs')
 export class SongsController {
@@ -16,8 +17,8 @@ export class SongsController {
     }
 
     @Post()
-    create(@Body() song: string) {
-        return this.songsService.create(song);
+    create(@Body() createSongDTO: CreateSongDTO) {
+        return this.songsService.create(createSongDTO);
     }
 
     @Patch(':id')
