@@ -44,7 +44,7 @@ export class SongsController {
 
   @Patch(':id')
   update(@Param('id') id: string) {
-    return `Update song with the id ${id}`;
+    return `Update song with the id ${id}!`;
   }
 
   @Delete(':id')
