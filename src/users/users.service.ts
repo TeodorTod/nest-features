@@ -18,14 +18,14 @@ export class UsersService {
     },
     {
       name: 'Jane',
-      age: 20,
+      age: 19,
       gender: 'female',
       isMarred: false,
       id: 2,
     },
     {
       name: 'Jack',
-      age: 20,
+      age: 22,
       gender: 'male',
       isMarred: false,
       id: 3,
