@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  DefaultValuePipe,
   Get,
   Param,
   ParseIntPipe,
@@ -9,6 +8,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -17,8 +17,10 @@ export class UsersController {
   @Get()
   getUsers(@Query() query: any) {
     if (query.gender) {
-      return this.usersService.getAllUsers().filter((user) => user.gender === query.gender);
-    } 
+      return this.usersService
+        .getAllUsers()
+        .filter((user) => user.gender === query.gender);
+    }
     return this.usersService.getAllUsers();
   }
 
@@ -28,15 +30,8 @@ export class UsersController {
   }
 
   @Post()
-  createUser(
-    @Body('user', new DefaultValuePipe({
-      name: 'Guest',
-      age: 0,
-      gender: 'male',
-      isMarred: false,
-      id: 0,
-    })) user: any
-  ) {
+  createUser(@Body() user: CreateUserDto) {
     return this.usersService.createUser(user);
   }
 }
+ 
