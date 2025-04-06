@@ -1,16 +1,23 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class UsersService {
-  private users: CreateUserDto[] = [
+  constructor(
+    @Inject(forwardRef(() => AuthService))
+    private readonly authService: AuthService,
+  ) {}
+
+  users: CreateUserDto[] = [
     {
       name: 'John',
       email: 'john@gmail.com',
       gender: 'male',
       isMarred: false,
       id: 1,
+      password: '123456',
     },
     {
       name: 'Jane',
@@ -18,6 +25,7 @@ export class UsersService {
       gender: 'female',
       isMarred: true,
       id: 2,
+      password: '123433',
     },
     {
       name: 'Jack',
@@ -25,11 +33,15 @@ export class UsersService {
       gender: 'male',
       isMarred: false,
       id: 3,
+      password: '123123',
     },
   ];
 
   getAllUsers() {
-    return this.users;
+    if (this.authService.isAuthenticated) {
+      return this.users;
+    }
+    return 'You are not authenticated';
   }
 
   getUserById(id: number) {
