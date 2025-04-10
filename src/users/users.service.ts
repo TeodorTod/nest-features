@@ -10,31 +10,32 @@ export class UsersService {
     private readonly authService: AuthService,
   ) {}
 
-  users: CreateUserDto[] = [
-    {
-      name: 'John',
-      email: 'john@gmail.com',
-      gender: 'male',
-      isMarred: false,
-      id: 1,
-      password: '123456',
-    },
-    {
-      name: 'Jane',
-      email: 'jane@gmail.com',
-      gender: 'female',
-      isMarred: true,
-      id: 2,
-      password: '123434',
-    },
-    {
-      name: 'Jack',
-      email: 'jack@gmail.com',
-      gender: 'male',
-      isMarred: false,
-      id: 3,
-      password: '123123',
-    },
+  users: CreateUserDto[] = 
+  [
+    // {
+    //   name: 'John',
+    //   email: 'john@gmail.com',
+    //   gender: 'male',
+    //   isMarred: false,
+    //   id: 1,
+    //   password: '123456',
+    // },
+    // {
+    //   name: 'Jane',
+    //   email: 'jane@gmail.com',
+    //   gender: 'female',
+    //   isMarred: true,
+    //   id: 2,
+    //   password: '123434',
+    // },
+    // {
+    //   name: 'Jack',
+    //   email: 'jack@gmail.com',
+    //   gender: 'male',
+    //   isMarred: false,
+    //   id: 3,
+    //   password: '123123',
+    // },
   ];
 
   getAllUsers() {
@@ -45,7 +46,8 @@ export class UsersService {
   }
 
   getUserById(id: number) {
-    return this.users.find((user) => user.id === id);
+    // return this.users.find((user) => user.id === id);
+    return null;
   }
 
   createUser(user: CreateUserDto) {
@@ -53,12 +55,14 @@ export class UsersService {
   }
 
   updateUser(id: number, user: UpdateUserDto) {
-    const index = this.users.findIndex((u) => u.id === id);
-    if (index === -1) return null;
+    // const index = this.users.findIndex((u) => u.id === id);
+    // if (index === -1) return null;
 
-    const existingUser = this.users[index];
-    const updatedUser = { ...existingUser, ...user };
-    this.users[index] = updatedUser;
-    return updatedUser;
+    // const existingUser = this.users[index];
+    // const updatedUser = { ...existingUser, ...user };
+    // this.users[index] = updatedUser;
+    // return updatedUser;
+    return null;
   }
+  
 }

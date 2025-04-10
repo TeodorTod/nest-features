@@ -5,6 +5,7 @@ import { UsersModule } from './users/users.module';
 import { TweetModule } from './tweet/tweet.module';
 import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from './users/user.entity';
 
 @Module({
   imports: [
@@ -22,7 +23,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         password: '123456',
         database: 'nestjs',
         autoLoadEntities: true,
-        entities: [],
+        entities: [User],
         synchronize: true,
       }),
     }),
