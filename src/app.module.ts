@@ -6,6 +6,7 @@ import { TweetModule } from './tweet/tweet.module';
 import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/user.entity';
+import { ProfileModule } from './profile/profile.module';
 
 @Module({
   imports: [
@@ -23,10 +24,11 @@ import { User } from './users/user.entity';
         password: '123456',
         database: 'nestjs',
         autoLoadEntities: true,
-        entities: [User],
+        // entities: [User],
         synchronize: true,
       }),
     }),
+    ProfileModule,
   ],
   controllers: [AppController],
   providers: [AppService],

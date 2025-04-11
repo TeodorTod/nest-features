@@ -11,10 +11,10 @@ export class TweetService {
     { text: 'Hello3', date: new Date(), userId: 3 },
   ];
 
-  getTweets(userId: number) {
-    const user = this.usersService.getUserById(userId);
-    const tweets = this.tweets.filter((tweet) => tweet.userId === userId);
-    const response = tweets.map(t => { return {text: t.text, date: t.date, user: user.name}});
-    return response;
-  }
+  // getTweets(userId: number) {
+  //   const user = this.usersService.getUserById(userId);
+  //   const tweets = this.tweets.filter((tweet) => tweet.userId === userId);
+  //   const response = tweets.map(t => { return {text: t.text, date: t.date, user: user.name}});
+  //   return response;
+  // }
 }

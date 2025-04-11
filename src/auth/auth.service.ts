@@ -10,12 +10,12 @@ export class AuthService {
 
   isAuthenticated: boolean = false;
 
-  login(email: string, password: string) {
-    const user = this.usersService.users.find(
-      (u) => u.email === email && u.password === password,
-    );
-    if (!user) return 'User does not exist';
-    this.isAuthenticated = true;
-    return 'MY_TOKEN';
-  }
+  // login(email: string, password: string) {
+  //   const user = this.usersService.users.find(
+  //     (u) => u.email === email && u.password === password,
+  //   );
+  //   if (!user) return 'User does not exist';
+  //   this.isAuthenticated = true;
+  //   return 'MY_TOKEN';
+  // }
 }

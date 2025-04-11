@@ -1,68 +1,30 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+
+import { Repository } from 'typeorm';
+import { User } from './user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { AuthService } from 'src/auth/auth.service';
+import { Profile } from 'src/profile/profile.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @Inject(forwardRef(() => AuthService))
-    private readonly authService: AuthService,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+    @InjectRepository(Profile)
+    private profileRepository: Repository<Profile>,
   ) {}
 
-  users: CreateUserDto[] = 
-  [
-    // {
-    //   name: 'John',
-    //   email: 'john@gmail.com',
-    //   gender: 'male',
-    //   isMarred: false,
-    //   id: 1,
-    //   password: '123456',
-    // },
-    // {
-    //   name: 'Jane',
-    //   email: 'jane@gmail.com',
-    //   gender: 'female',
-    //   isMarred: true,
-    //   id: 2,
-    //   password: '123434',
-    // },
-    // {
-    //   name: 'Jack',
-    //   email: 'jack@gmail.com',
-    //   gender: 'male',
-    //   isMarred: false,
-    //   id: 3,
-    //   password: '123123',
-    // },
-  ];
-
   getAllUsers() {
-    if (this.authService.isAuthenticated) {
-      return this.users;
-    }
-    return 'You are not authenticated';
+    return this.userRepository.find();
   }
 
-  getUserById(id: number) {
-    // return this.users.find((user) => user.id === id);
-    return null;
+  public async createUser(userDto: CreateUserDto) {
+    userDto.profile = userDto.profile ?? {};
+    let profile = this.profileRepository.create(userDto.profile);
+    this.profileRepository.save(profile);
+    const user = this.userRepository.create(userDto);
+    user.profile = profile;
+    return this.userRepository.save(user);
   }
-
-  createUser(user: CreateUserDto) {
-    this.users.push(user);
-  }
-
-  updateUser(id: number, user: UpdateUserDto) {
-    // const index = this.users.findIndex((u) => u.id === id);
-    // if (index === -1) return null;
-
-    // const existingUser = this.users[index];
-    // const updatedUser = { ...existingUser, ...user };
-    // this.users[index] = updatedUser;
-    // return updatedUser;
-    return null;
-  }
-  
 }
