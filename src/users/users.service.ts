@@ -21,10 +21,7 @@ export class UsersService {
 
   public async createUser(userDto: CreateUserDto) {
     userDto.profile = userDto.profile ?? {};
-    let profile = this.profileRepository.create(userDto.profile);
-    this.profileRepository.save(profile);
     const user = this.userRepository.create(userDto);
-    user.profile = profile;
     return this.userRepository.save(user);
   }
 }
