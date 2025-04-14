@@ -11,6 +11,7 @@ import {
   NotFoundException,
   UsePipes,
   ValidationPipe,
+  Delete,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -46,4 +47,9 @@ export class UsersController {
   // ) {
   //   return this.usersService.updateUser(id, user);
   // }
+
+  @Delete(':id')
+  deleteUser(@Param('id', ParseIntPipe) id: number) {
+    return this.usersService.deleteUser(id);
+  }
 }

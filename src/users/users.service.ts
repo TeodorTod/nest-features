@@ -16,12 +16,23 @@ export class UsersService {
   ) {}
 
   getAllUsers() {
-    return this.userRepository.find();
+    return this.userRepository.find({
+      relations: ['profile'],
+    });
+  }
+
+  public async findUserById(id: number) {
+    return await this.userRepository.findOneBy({id});
   }
 
   public async createUser(userDto: CreateUserDto) {
     userDto.profile = userDto.profile ?? {};
     const user = this.userRepository.create(userDto);
     return this.userRepository.save(user);
+  }
+
+  public async deleteUser(id: number) {
+    await this.userRepository.delete(id);
+    return {deleted: true};
   }
 }
