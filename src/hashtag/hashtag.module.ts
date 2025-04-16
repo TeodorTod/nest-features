@@ -8,5 +8,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   controllers: [HashtagController],
   providers: [HashtagService],
   imports: [TypeOrmModule.forFeature([Hashtag])],
+  exports: [HashtagService],
 })
 export class HashtagModule {}
