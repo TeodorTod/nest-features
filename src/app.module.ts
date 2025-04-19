@@ -8,7 +8,8 @@ import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ProfileModule } from './profile/profile.module';
 import { HashtagModule } from './hashtag/hashtag.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { appConfig } from './config/app.config';
+import databaseConfig from './config/database.config';
+import appConfig from './config/app.config';
 
 const ENV = process.env.NODE_ENV;
 
@@ -18,15 +19,15 @@ const ENV = process.env.NODE_ENV;
     TweetModule,
     AuthModule,
     ConfigModule.forRoot({
-      isGlobal: true,
+      isGlobal: true, 
       envFilePath: !ENV ? '.env' : `.env.${ENV.trim()}`,
-      load: [appConfig],
+      load: [appConfig, databaseConfig],
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService): TypeOrmModuleOptions => ({
-        type: 'postgres',
+        type: configService.get<string>('database.type') as 'postgres',
         host: configService.get<string>('database.host'),
         port: parseInt(configService.get<string>('database.port'), 10),
         username: configService.get<string>('database.username'),
