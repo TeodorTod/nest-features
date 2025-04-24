@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  HttpException,
   Injectable,
   RequestTimeoutException,
 } from '@nestjs/common';
@@ -9,6 +10,7 @@ import { User } from './user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Profile } from 'src/profile/profile.entity';
+import { UserAlreadyExistsException } from 'src/customExeptions/user-already-exists.exeption';
 
 @Injectable()
 export class UsersService {
@@ -37,21 +39,31 @@ export class UsersService {
   }
 
   public async findUserById(id: number) {
-    return await this.userRepository.findOneBy({ id });
+    const user = await this.userRepository.findOneBy({ id });
+    if (!user) {
+      throw new HttpException(`User with ID ${id} not found`, 404);
+    }
+    return user;
   }
 
   public async createUser(userDto: CreateUserDto) {
     try {
       userDto.profile = userDto.profile ?? {};
 
-      const existingUser = await this.userRepository.findOne({
-        where: [{ email: userDto.email }, { username: userDto.username }],
+      const existingUserWithUsername = await this.userRepository.findOne({
+        where: { username: userDto.username },
       });
 
-      if (existingUser) {
-        throw new BadRequestException(
-          'User with this email/username already exists',
-        );
+      if (existingUserWithUsername) {
+        throw new UserAlreadyExistsException('username', userDto.username);
+      }
+
+      const existingUserWithEmail = await this.userRepository.findOne({
+        where: { email: userDto.email },
+      });
+
+      if (existingUserWithEmail) {
+        throw new UserAlreadyExistsException('email', userDto.email);
       }
 
       const user = this.userRepository.create(userDto);
@@ -66,7 +78,7 @@ export class UsersService {
         );
       }
 
-      if (error instanceof BadRequestException) {
+      if (error instanceof HttpException) {
         throw error;
       }
 
