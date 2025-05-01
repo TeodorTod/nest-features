@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateTweetDto } from './dto/create-tweet.dto';
 import { HashtagService } from 'src/hashtag/hashtag.service';
 import { UpdateTweetDto } from './dto/update-tweet.dto';
+import { PaginationQueryDto } from 'src/common/pagination/dto/pagination-query.dto';
 
 @Injectable()
 export class TweetService {
@@ -16,7 +17,7 @@ export class TweetService {
     private readonly tweetRepository: Repository<Tweet>,
   ) {}
 
-  public async getTweets(userId: number) {
+  public async getTweets(userId: number, pageQueryDto: PaginationQueryDto) {
     let user = await this.usersService.findUserById(userId);
     if (!user) {
       throw new NotFoundException('User not found');
@@ -24,12 +25,16 @@ export class TweetService {
     return await this.tweetRepository.find({
       where: { user: { id: userId } },
       relations: ['user', 'hashtags'],
+      skip: (pageQueryDto.page - 1) * pageQueryDto.limit,
+      take: pageQueryDto.limit,
     });
   }
 
   public async createTweet(createTweetDto: CreateTweetDto) {
     const user = await this.usersService.findUserById(createTweetDto.userId);
-    const hashtags = await this.hashtagService.findHashtags(createTweetDto.hashtags);
+    const hashtags = createTweetDto.hashtags 
+    ? await this.hashtagService.findHashtags(createTweetDto.hashtags)
+    : [];
     const tweet = await this.tweetRepository.create({ ...createTweetDto, user, hashtags });
     return await this.tweetRepository.save(tweet);
   }
