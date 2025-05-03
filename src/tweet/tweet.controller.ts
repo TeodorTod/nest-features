@@ -24,7 +24,7 @@ export class TweetController {
     @Query() paginationQueryDto: PaginationQueryDto,
   ) {
     console.log(paginationQueryDto);
-    return this.tweetService.getTweets(userId, paginationQueryDto   );
+    return this.tweetService.getTweets(userId, paginationQueryDto);
   }
 
   @Post()

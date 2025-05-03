@@ -7,6 +7,7 @@ import { CreateTweetDto } from './dto/create-tweet.dto';
 import { HashtagService } from 'src/hashtag/hashtag.service';
 import { UpdateTweetDto } from './dto/update-tweet.dto';
 import { PaginationQueryDto } from 'src/common/pagination/dto/pagination-query.dto';
+import { PaginationProvider } from 'src/common/pagination/pagination.provider';
 
 @Injectable()
 export class TweetService {
@@ -15,6 +16,7 @@ export class TweetService {
     private readonly hashtagService: HashtagService,
     @InjectRepository(Tweet)
     private readonly tweetRepository: Repository<Tweet>,
+    private readonly paginationProvider: PaginationProvider,
   ) {}
 
   public async getTweets(userId: number, pageQueryDto: PaginationQueryDto) {
@@ -22,25 +24,30 @@ export class TweetService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    return await this.tweetRepository.find({
-      where: { user: { id: userId } },
-      relations: ['user', 'hashtags'],
-      skip: (pageQueryDto.page - 1) * pageQueryDto.limit,
-      take: pageQueryDto.limit,
-    });
+    return await this.paginationProvider.paginateQuery(
+      pageQueryDto,
+      this.tweetRepository,
+      { user: { id: userId } },
+    );
   }
 
   public async createTweet(createTweetDto: CreateTweetDto) {
     const user = await this.usersService.findUserById(createTweetDto.userId);
-    const hashtags = createTweetDto.hashtags 
-    ? await this.hashtagService.findHashtags(createTweetDto.hashtags)
-    : [];
-    const tweet = await this.tweetRepository.create({ ...createTweetDto, user, hashtags });
+    const hashtags = createTweetDto.hashtags
+      ? await this.hashtagService.findHashtags(createTweetDto.hashtags)
+      : [];
+    const tweet = await this.tweetRepository.create({
+      ...createTweetDto,
+      user,
+      hashtags,
+    });
     return await this.tweetRepository.save(tweet);
   }
 
   public async updateTweet(updateTweetDto: UpdateTweetDto) {
-    const hashtags = await this.hashtagService.findHashtags(updateTweetDto.hashtags);
+    const hashtags = await this.hashtagService.findHashtags(
+      updateTweetDto.hashtags,
+    );
     const tweet = await this.tweetRepository.findOneBy({
       id: updateTweetDto.id,
     });

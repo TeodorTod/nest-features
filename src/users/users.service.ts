@@ -23,9 +23,7 @@ export class UsersService {
 
   public async getAllUsers() {
     try {
-      return await this.userRepository.find({
-        relations: ['profile'],
-      });
+      return await this.userRepository.find({});
     } catch (error) {
       if (error.code === 'ECONNREFUSED') {
         throw new RequestTimeoutException(
