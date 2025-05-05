@@ -32,10 +32,10 @@ export class UsersController {
     return this.usersService.findUserById(id);
   }
 
-  @Post()
-  createUser(@Body() user: CreateUserDto) {
-    return this.usersService.createUser(user);
-  }
+  // @Post()
+  // createUser(@Body() user: CreateUserDto) {
+  //   return this.usersService.createUser(user);
+  // }
 
   // @Patch(':id')
   // updateUser(
