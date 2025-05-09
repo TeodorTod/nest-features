@@ -12,11 +12,13 @@ import {
   UsePipes,
   ValidationPipe,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PaginationQueryDto } from 'src/common/pagination/dto/pagination-query.dto';
+import { AuthorizeGuard } from 'src/auth/guards/authorize.guard';
 
 @Controller('users')
 export class UsersController {
@@ -27,6 +29,7 @@ export class UsersController {
     return this.usersService.getAllUsers(paginationQueryDto);
   }
 
+  @UseGuards(AuthorizeGuard)
   @Get(':id')
   findUserById(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.findUserById(id);

@@ -6,14 +6,22 @@ import { ConfigModule } from '@nestjs/config';
 import { BcryptProvider } from './provider/bcrypt.provider';
 import authConfig from './config/auth.config';
 import { HashingProvider } from './provider/hashing.provider';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService, {
-    provide: HashingProvider,
-    useClass: BcryptProvider,
-  }],
-  imports: [forwardRef(() => UsersModule), ConfigModule.forFeature(authConfig)],
+  providers: [
+    AuthService,
+    {
+      provide: HashingProvider,
+      useClass: BcryptProvider,
+    },
+  ],
+  imports: [
+    forwardRef(() => UsersModule),
+    ConfigModule.forFeature(authConfig),
+    JwtModule.registerAsync(authConfig.asProvider()),
+  ],
   exports: [AuthService, HashingProvider],
 })
 export class AuthModule {}
