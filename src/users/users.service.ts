@@ -121,7 +121,7 @@ export class UsersService {
         description: 'User with given username not found!',
       });
     }
- 
+
     if (!user) {
       throw new UnauthorizedException(
         `User with username ${username} does not exist!`,

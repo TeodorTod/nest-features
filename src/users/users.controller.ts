@@ -21,6 +21,7 @@ import { PaginationQueryDto } from 'src/common/pagination/dto/pagination-query.d
 import { AuthorizeGuard } from 'src/auth/guards/authorize.guard';
 
 @Controller('users')
+@UseGuards(AuthorizeGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -29,7 +30,6 @@ export class UsersController {
     return this.usersService.getAllUsers(paginationQueryDto);
   }
 
-  @UseGuards(AuthorizeGuard)
   @Get(':id')
   findUserById(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.findUserById(id);
