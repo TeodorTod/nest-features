@@ -19,7 +19,7 @@ export class TweetController {
   constructor(private readonly tweetService: TweetService) {}
 
   @Get(':userId?')
-  public getTweets(
+  public getTweets( 
     @Param('userId', ParseIntPipe) userId: number,
     @Query() paginationQueryDto: PaginationQueryDto,
   ) {

@@ -12,6 +12,10 @@ import { PaginationModule } from './common/pagination/pagination.module';
 import databaseConfig from './config/database.config';
 import appConfig from './config/app.config';
 import envValidator from './auth/config/env.validation';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthorizeGuard } from './auth/guards/authorize.guard';
+import { JwtModule } from '@nestjs/jwt';
+import authConfig from './auth/config/auth.config';
 
 const ENV = process.env.NODE_ENV;
 
@@ -21,7 +25,7 @@ const ENV = process.env.NODE_ENV;
     TweetModule,
     AuthModule,
     ConfigModule.forRoot({
-      isGlobal: true, 
+      isGlobal: true,
       envFilePath: !ENV ? '.env' : `.env.${ENV.trim()}`,
       load: [appConfig, databaseConfig],
       validationSchema: envValidator,
@@ -36,15 +40,25 @@ const ENV = process.env.NODE_ENV;
         username: configService.get<string>('database.username'),
         password: configService.get<string>('database.password'),
         database: configService.get<string>('database.database'),
-        autoLoadEntities: configService.get<boolean>('database.autoloadEntities'),
+        autoLoadEntities: configService.get<boolean>(
+          'database.autoloadEntities',
+        ),
         synchronize: configService.get<boolean>('database.synchronize'),
       }),
     }),
     ProfileModule,
     HashtagModule,
     PaginationModule,
+    ConfigModule.forFeature(authConfig),
+    JwtModule.registerAsync(authConfig.asProvider()),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthorizeGuard,
+    },
+  ],
 })
 export class AppModule {}
