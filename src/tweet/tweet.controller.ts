@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Query,
+  Req,
 } from '@nestjs/common';
 import { TweetService } from './tweet.service';
 import { CreateTweetDto } from './dto/create-tweet.dto';
@@ -23,12 +24,11 @@ export class TweetController {
     @Param('userId', ParseIntPipe) userId: number,
     @Query() paginationQueryDto: PaginationQueryDto,
   ) {
-    console.log(paginationQueryDto);
     return this.tweetService.getTweets(userId, paginationQueryDto);
   }
 
   @Post()
-  public createTweet(@Body() createTweetDto: CreateTweetDto) {
+  public createTweet(@Body() createTweetDto: CreateTweetDto, @Req() request) {    
     return this.tweetService.createTweet(createTweetDto);
   }
 
