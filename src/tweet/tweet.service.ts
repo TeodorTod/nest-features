@@ -1,4 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+  RequestTimeoutException,
+} from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
 import { Tweet } from './tweet.entity';
@@ -9,6 +15,7 @@ import { UpdateTweetDto } from './dto/update-tweet.dto';
 import { PaginationQueryDto } from 'src/common/pagination/dto/pagination-query.dto';
 import { PaginationProvider } from 'src/common/pagination/pagination.provider';
 import { Paginated } from 'src/common/pagination/paginated.interface';
+import { ActiveUserType } from 'src/auth/interfaces/active-user-type.interface';
 
 @Injectable()
 export class TweetService {
@@ -35,17 +42,32 @@ export class TweetService {
     );
   }
 
-  public async createTweet(createTweetDto: CreateTweetDto) {
-    const user = await this.usersService.findUserById(createTweetDto.userId);
-    const hashtags = createTweetDto.hashtags
-      ? await this.hashtagService.findHashtags(createTweetDto.hashtags)
-      : [];
-    const tweet = await this.tweetRepository.create({
+  public async createTweet(createTweetDto: CreateTweetDto, userId: number) {
+    let user;
+    let hashtags;
+    try {
+      user = await this.usersService.findUserById(userId);
+      if (createTweetDto.hashtags) {
+        hashtags = await this.hashtagService.findHashtags(
+          createTweetDto.hashtags,
+        );
+      }
+    } catch (error) {
+      throw new RequestTimeoutException();
+    }
+    if (createTweetDto.hashtags?.length !== hashtags?.length) {
+      throw new BadRequestException('Hashtag not found');
+    }
+    const tweet = this.tweetRepository.create({
       ...createTweetDto,
       user,
       hashtags,
     });
-    return await this.tweetRepository.save(tweet);
+    try {
+      return await this.tweetRepository.save(tweet);
+    } catch (error) {
+      throw new ConflictException();
+    }
   }
 
   public async updateTweet(updateTweetDto: UpdateTweetDto) {
