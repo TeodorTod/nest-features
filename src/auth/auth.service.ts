@@ -48,11 +48,37 @@ export class AuthService {
         issuer: this.authConfiguration.issuer,
       },
     );
+    const refreshToken = await this.jwtService.signAsync(
+      {
+        sub: user.id,
+      },
+      {
+        secret: this.authConfiguration.secret,
+        expiresIn: this.authConfiguration.refreshTokenExpirationTime,
+        audience: this.authConfiguration.audience,
+        issuer: this.authConfiguration.issuer,
+      },
+    );
 
     return { token };
   }
 
   public async signup(createUserDto: CreateUserDto) {
     return await this.usersService.createUser(createUserDto);
+  }
+
+  private async signToken<T>(userId: number, expiresIn: number, payload?: T) {
+    return await this.jwtService.signAsync(
+      {
+        email: userId,
+        ...payload,
+      },
+      {
+        secret: this.authConfiguration.secret,
+        expiresIn: expiresIn,
+        audience: this.authConfiguration.audience,
+        issuer: this.authConfiguration.issuer,
+      },
+    );
   }
 }
