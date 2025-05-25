@@ -11,6 +11,9 @@ import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { HashingProvider } from './provider/hashing.provider';
 import { JwtService } from '@nestjs/jwt';
+import { User } from 'src/users/user.entity';
+import { ActiveUserType } from './interfaces/active-user-type.interface';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @Injectable()
 export class AuthService {
@@ -36,31 +39,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const token = await this.jwtService.signAsync(
-      {
-        email: user.email,
-        sub: user.id,
-      },
-      {
-        secret: this.authConfiguration.secret,
-        expiresIn: this.authConfiguration.expirationTime,
-        audience: this.authConfiguration.audience,
-        issuer: this.authConfiguration.issuer,
-      },
-    );
-    const refreshToken = await this.jwtService.signAsync(
-      {
-        sub: user.id,
-      },
-      {
-        secret: this.authConfiguration.secret,
-        expiresIn: this.authConfiguration.refreshTokenExpirationTime,
-        audience: this.authConfiguration.audience,
-        issuer: this.authConfiguration.issuer,
-      },
-    );
-
-    return { token };
+    return this.generateToken(user);
   }
 
   public async signup(createUserDto: CreateUserDto) {
@@ -70,7 +49,7 @@ export class AuthService {
   private async signToken<T>(userId: number, expiresIn: number, payload?: T) {
     return await this.jwtService.signAsync(
       {
-        email: userId,
+        sub: userId,
         ...payload,
       },
       {
@@ -80,5 +59,39 @@ export class AuthService {
         issuer: this.authConfiguration.issuer,
       },
     );
+  }
+
+  private async generateToken(user: User) {
+    const accessToken = await this.signToken<Partial<ActiveUserType>>(
+      user.id,
+      this.authConfiguration.expirationTime,
+      { email: user.email },
+    );
+
+    const refreshToken = await this.signToken(
+      user.id,
+      this.authConfiguration.refreshTokenExpirationTime,
+    );
+    return { token: accessToken, refreshToken };
+  }
+
+  public async refreshToken(refreshTokenDto: RefreshTokenDto) {
+    try {
+      const { sub } = await this.jwtService.verifyAsync(
+        refreshTokenDto.refreshToken,
+        {
+          secret: this.authConfiguration.secret,
+          audience: this.authConfiguration.audience,
+          issuer: this.authConfiguration.issuer,
+        },
+      );
+      const user = await this.usersService.findUserById(sub);
+      return await this.generateToken(user);
+    } catch (error) {
+      if (error.name === 'TokenExpiredError') {
+        throw new UnauthorizedException('Refresh token expired');
+      }
+      throw new UnauthorizedException('Invalid refresh token');
+    }
   }
 }
